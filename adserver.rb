@@ -34,7 +34,7 @@ before do
 end
 
 get '/' do
-
+  erb :welcome
 end
 
 get '/ad' do

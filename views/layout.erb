@@ -8,5 +8,9 @@
 
   <%= yield %>
 
+  <div id=""debug">
+    <p>The time is <%= Time.now.strftime("%I:%M %p") %>.</p>
+    <p>Sinatra version <%= Sinatra::VERSION %>.</p>
+  </div>
 </body>
 </html>
