@@ -74,7 +74,7 @@ get '/delete/:id' do
   unless ad.nil?
     path = File.join(Dir.pwd, "/public/ads", ad.filename)
     File.delete(path)
-    ad.delete
+    ad.destroy
   end
   redirect('/list')
 end
