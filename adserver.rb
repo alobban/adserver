@@ -54,9 +54,7 @@ get '/new' do
 end
 
 post '/create' do
-  puts "I am at the beginning"
   @ad = Ad.new(params[:ad])
-  puts "This is ad instance #{@ad.inspect}"
   @ad.content_type = params[:image][:type]
   puts @ad.content_type
   @ad.size = File.size(params[:image][:tempfile])
@@ -72,7 +70,13 @@ post '/create' do
 end
 
 get '/delete/:id' do
-
+  ad = Ad.get(params[:id])
+  unless ad.nil?
+    path = File.join(Dir.pwd, "/public/ads", ad.filename)
+    File.delete(path)
+    ad.delete
+  end
+  redirect('/list')
 end
 
 get '/show/:id' do
