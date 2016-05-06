@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <title><%= @title %></title>
-  <link href="/styles.css" rel="stylesheet" type="text/css" />
+  <link href="css/styles.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 
   <%= yield %>
 
-  <div id=""debug">
-    <p>The time is <%= Time.now.strftime("%I:%M %p") %>.</p>
+  <div id="debug">
+    <p>The time is <%= Time.now.strftime("%I:%M:%S %p") %>.</p>
     <p>Sinatra version <%= Sinatra::VERSION %>.</p>
   </div>
 </body>

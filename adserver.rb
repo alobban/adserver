@@ -34,6 +34,7 @@ before do
 end
 
 get '/' do
+  @title = "Welcome to the Clashere Adserver"
   erb :welcome
 end
 
