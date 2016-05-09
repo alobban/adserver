@@ -24,6 +24,20 @@ class Ad
   property :size,                   Integer
   property :content_type,           String
 
+  has n, :clicks
+
+end
+
+class Click
+
+  include DataMapper::Resource
+
+  property :id,                     Serial
+  property :ip_address,             String
+  property :created_at,             DateTime
+
+  belongs_to :ad
+
 end
 
 # Create or upgrade all table at once, like magic
@@ -39,7 +53,7 @@ get '/' do
 end
 
 get '/ad' do
-  id = repository(:default).adapter.query(
+  id = repository(:default).adapter.select(
       'SELECT id FROM ads ORDER BY random() LIMIT 1;'
   )
   @ad = Ad.get(id)
@@ -93,5 +107,7 @@ get '/show/:id' do
 end
 
 get '/click/:id' do
-
+  ad = Ad.get(params[:id])
+  ad.clicks.create(:ip_address => env["REMOTE_ADDR"])
+  redirect(ad.url)
 end
