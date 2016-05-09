@@ -1,9 +1,11 @@
+# $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'rubygems'
 require 'sinatra'
 require 'dm-core'
 require 'dm-timestamps'
 require 'dm-sqlite-adapter'
 require 'dm-migrations'
+require './lib/authorization'
 
 DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/adserver.db")
 
@@ -43,6 +45,10 @@ end
 # Create or upgrade all table at once, like magic
 DataMapper.auto_upgrade!
 
+helpers do
+  include Sinatra::Authorization
+end
+
 before do
   headers "Content-Type" => "text/html; charset=utf-8"
 end
@@ -56,23 +62,26 @@ get '/ad' do
   id = repository(:default).adapter.select(
       'SELECT id FROM ads ORDER BY random() LIMIT 1;'
   )
-  puts "this is id's value: #{id}"
+  # puts "this is id's value: #{id}"
   @ad = Ad.get(id)
   erb :ad, :layout => false
 end
 
 get '/list' do
+  require_admin
   @title = "List Ads"
   @ads = Ad.all(:order => [:created_at.desc])
   erb :list
 end
 
 get '/new' do
+  require_admin
   @title = "Create A New Ad"
   erb :new
 end
 
 post '/create' do
+  require_admin
   @ad = Ad.new(params[:ad])
   @ad.content_type = params[:image][:type]
   puts @ad.content_type
@@ -89,6 +98,7 @@ post '/create' do
 end
 
 get '/delete/:id' do
+  require_admin
   ad = Ad.get(params[:id])
   unless ad.nil?
     path = File.join(Dir.pwd, "/public/ads", ad.filename)
@@ -99,6 +109,7 @@ get '/delete/:id' do
 end
 
 get '/show/:id' do
+  require_admin
   @ad = Ad.get(params[:id])
   if @ad
     erb :show

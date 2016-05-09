@@ -6,9 +6,13 @@
 </head>
 <body>
 
+<% if authorized? %>
+
   <div id="nav">
     <a href="/list">List</a> | <a href="/new">New</a>
   </div>
+
+<% end %>
 
   <%= yield %>
 
