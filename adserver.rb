@@ -39,7 +39,11 @@ get '/' do
 end
 
 get '/ad' do
-
+  id = repository(:default).adapter.query(
+      'SELECT id FROM ads ORDER BY random() LIMIT 1;'
+  )
+  @ad = Ad.get(id)
+  erb :ad, :layout => false
 end
 
 get '/list' do
