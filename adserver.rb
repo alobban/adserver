@@ -13,20 +13,29 @@ class Ad
 
   include DataMapper::Resource
 
-  property :id,                     Serial
-  property :title,                  String
-  property :content,                Text
-  property :width,                  Integer
-  property :height,                 Integer
-  property :filename,               String
-  property :url,                    String
-  property :is_active,              Boolean
-  property :created_at,             DateTime
-  property :updated_at,             DateTime
-  property :size,                   Integer
-  property :content_type,           String
+  property :id, Serial
+  property :title, String
+  property :content, Text
+  property :width, Integer
+  property :height, Integer
+  property :filename, String
+  property :url, String
+  property :is_active, Boolean
+  property :created_at, DateTime
+  property :updated_at, DateTime
+  property :size, Integer
+  property :content_type, String
 
   has n, :clicks
+
+  def handle_upload(file)
+    self.content_type = file[:type]
+    self.size = File.size(file[:tempfile])
+    path = File.join(Dir.pwd, "/public/ads", self.filename)
+    File.open(path, "wb") do |f|
+      f.write(file[:tempfile].read)
+    end
+  end
 
 end
 
@@ -34,16 +43,18 @@ class Click
 
   include DataMapper::Resource
 
-  property :id,                     Serial
-  property :ip_address,             String
-  property :created_at,             DateTime
+  property :id, Serial
+  property :ip_address, String
+  property :created_at, DateTime
 
   belongs_to :ad
 
 end
 
+configure :development do
 # Create or upgrade all table at once, like magic
-DataMapper.auto_upgrade!
+  DataMapper.auto_upgrade!
+end
 
 helpers do
   include Sinatra::Authorization
@@ -83,14 +94,8 @@ end
 post '/create' do
   require_admin
   @ad = Ad.new(params[:ad])
-  @ad.content_type = params[:image][:type]
-  puts @ad.content_type
-  @ad.size = File.size(params[:image][:tempfile])
+  @ad.handle_upload(params[:image])
   if @ad.save
-    path = File.join(Dir.pwd, "/public/ads", @ad.filename)
-    File.open(path, "wb") do |f|
-      f.write(params[:image][:tempfile].read)
-    end
     redirect "/show/#{@ad.id}"
   else
     redirect('/list')
