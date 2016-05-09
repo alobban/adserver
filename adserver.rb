@@ -56,6 +56,7 @@ get '/ad' do
   id = repository(:default).adapter.select(
       'SELECT id FROM ads ORDER BY random() LIMIT 1;'
   )
+  puts "this is id's value: #{id}"
   @ad = Ad.get(id)
   erb :ad, :layout => false
 end
